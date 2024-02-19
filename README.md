@@ -14,9 +14,10 @@ Currently MCMonitor can:
 ![MCMonitor status panel](/Screenshots/MCMonitor10.png)
 
 # Instructions
-- Install Net8 runtime if needed:
+- Install Net8 runtime if you don't have it yet:
 > C:\\> winget install Microsoft.DotNet.DesktopRuntime.8
-- Drop MCMonitor.exe in any folder with Write permissions
+- Get MCMonitor [latest release](https://github.com/zybexXL/MCMonitor/releases)
+- Extract to any folder with Write prmissions
 - Run it once - Notepad will open the default configuration, edit to your needs
 - Run it again to start. It will stay running as a System Tray icon
 - Click the tray icon to open a minimal status panel
