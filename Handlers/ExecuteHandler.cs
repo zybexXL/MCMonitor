@@ -127,7 +127,7 @@ namespace MCMonitor
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.FileName = args[0];
-                startInfo.Arguments = args[1];
+                startInfo.Arguments = args.Length > 1 ? args[1] : "";
                 startInfo.UseShellExecute = false;
                 startInfo.CreateNoWindow = true;
                 startInfo.WorkingDirectory = workingDirectory ?? "";
