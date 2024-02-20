@@ -45,26 +45,14 @@ namespace MCMonitor
             template = template.Replace("$type", e.Type ?? "", StringComparison.InvariantCultureIgnoreCase);
             template = template.Replace("$arg1", e.Arg1 ?? "", StringComparison.InvariantCultureIgnoreCase);
             template = template.Replace("$arg2", e.Arg2 ?? "", StringComparison.InvariantCultureIgnoreCase);
-            template = template.Replace("$state", GetPlayingState(e.getPlaybackInfo("State")), StringComparison.InvariantCultureIgnoreCase);
-            template = template.Replace("$currKey", e.getPlaybackInfo("FileKey"), StringComparison.InvariantCultureIgnoreCase);
-            template = template.Replace("$nextKey", e.getPlaybackInfo("NextFileKey"), StringComparison.InvariantCultureIgnoreCase);
+            template = template.Replace("$state", e.State, StringComparison.InvariantCultureIgnoreCase);
+            template = template.Replace("$currKey", e.PlaybackInfo?["FileKey"], StringComparison.InvariantCultureIgnoreCase);
+            template = template.Replace("$nextKey", e.PlaybackInfo?["NextFileKey"], StringComparison.InvariantCultureIgnoreCase);
 
             // handle $[] vars
             template = Regex.Replace(template, @"(\$[\$i]?)\[(.+?)\]", m => GetVariableValue(m, e));
 
             return template;
-        }
-
-        protected string GetPlayingState(string state)
-        {
-            switch (state)
-            {
-                case "0": return "STOPPED";
-                case "1": return "PAUSED";
-                case "2": return "PLAYING";
-                case "3": return "WAITING";
-            }
-            return state;
         }
 
         protected string GetVariableValue(Match match, MCEventInfo e)
@@ -73,9 +61,9 @@ namespace MCMonitor
             string value = null;
             switch (match.Groups[1].Value)
             {
-                case "$": value = e.getCurrentFileInfo(field); break;
-                case "$$": value = e.getNextFileInfo(field); break;
-                case "$i": value = e.getPlaybackInfo(field); break;
+                case "$": value = e.CurrentFile?[field]; break;
+                case "$$": value = e.NextFile?[field]; break;
+                case "$i": value = e.PlaybackInfo?[field]; break;
             }
             if (string.IsNullOrEmpty(value))
                 value = "\"\"";

@@ -38,7 +38,7 @@
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
-            label5 = new System.Windows.Forms.Label();
+            lblVersion = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
             btnClose = new System.Windows.Forms.Button();
             toolTip1 = new System.Windows.Forms.ToolTip(components);
@@ -153,16 +153,16 @@
             label4.TabIndex = 2;
             label4.Text = "Events Received:";
             // 
-            // label5
+            // lblVersion
             // 
-            label5.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            label5.AutoSize = true;
-            label5.ForeColor = System.Drawing.Color.Gray;
-            label5.Location = new System.Drawing.Point(12, 168);
-            label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(158, 17);
-            label5.TabIndex = 2;
-            label5.Text = "MCMonitor v1.0 by Zybex";
+            lblVersion.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            lblVersion.AutoSize = true;
+            lblVersion.ForeColor = System.Drawing.Color.Gray;
+            lblVersion.Location = new System.Drawing.Point(12, 168);
+            lblVersion.Name = "lblVersion";
+            lblVersion.Size = new System.Drawing.Size(158, 17);
+            lblVersion.TabIndex = 2;
+            lblVersion.Text = "MCMonitor v1.0 by Zybex";
             // 
             // label6
             // 
@@ -246,7 +246,7 @@
             ControlBox = false;
             Controls.Add(btnClose);
             Controls.Add(label6);
-            Controls.Add(label5);
+            Controls.Add(lblVersion);
             Controls.Add(label3);
             Controls.Add(lblErrors);
             Controls.Add(lblIgnored);
@@ -269,6 +269,7 @@
             TopMost = true;
             Shown += TrayForm_Shown;
             KeyPress += TrayForm_KeyPress;
+            MouseDown += TrayForm_MouseDown;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -283,7 +284,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblVersion;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button btnClose;

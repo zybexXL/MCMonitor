@@ -32,6 +32,12 @@ namespace MCMonitor
         public static int FilteredEvents = 0;
         public static int ProcessingErrors = 0;
 
+        bool FetchPlaybackInfo;
+        bool FetchFileInfo;
+        SafeDictionary<string, string> PlaybackInfo;
+        SafeDictionary<string, string> CurrentFileInfo;
+        SafeDictionary<string, string> NextFileInfo;
+        DateTime InfoDate;
 
         public MCEventQueue(Config config)
         {
@@ -44,6 +50,9 @@ namespace MCMonitor
             logWriter = new LogHandler(config);
             websocket = new WebSocketHandler(config);
             executer = new ExecuteHandler(config);
+
+            FetchFileInfo = jsonWriter.NeedsDetails || logWriter.NeedsDetails || websocket.NeedsDetails || executer.NeedsDetails;
+            FetchPlaybackInfo = FetchFileInfo || jsonWriter.NeedsPlaybackInfo || logWriter.NeedsPlaybackInfo || websocket.NeedsPlaybackInfo || executer.NeedsPlaybackInfo;
         }
 
         public void Start()
@@ -110,13 +119,19 @@ namespace MCMonitor
         {
             try
             {
+                // update info
+                if (UpdatePlaybackInfo())
+                    InfoDate = e.Timestamp;
+
                 // always log regardless of filter
                 Process(logWriter, e);
 
+                // check filter
                 if (isFilteredOut(e))
                     FilteredEvents++;
                 else
                 {
+                    // process event
                     ProcessedEvents++;
                     Process(jsonWriter, e);
                     Process(websocket, e);
@@ -149,52 +164,79 @@ namespace MCMonitor
             if (!writer.isEnabled)
                 return;
 
-            if ((writer.NeedsPlaybackInfo || writer.NeedsDetails) && e.PlaybackInfo == null)
-                e.PlaybackInfo = GetPlaybackInfo();
-
-            if (e.Source == EventSource.MCEvent)
-            {
-                if (writer.NeedsDetails && e.CurrentFile == null)
-                    e.CurrentFile = GetFile(e.getPlaybackInfo("FileKey"), fieldList);
-
-                if (writer.NeedsDetails && e.NextFile == null)
-                    e.NextFile = GetFile(e.getPlaybackInfo("NextFileKey"), fieldList);
-            }
+            // set or clear current info for this writer
+            e.PlaybackInfo = (writer.NeedsPlaybackInfo || writer.NeedsDetails) ? PlaybackInfo : null;
+            e.CurrentFile = writer.NeedsDetails ? CurrentFileInfo : null;
+            e.NextFile = writer.NeedsDetails ? NextFileInfo : null;
+            e.InfoTimestamp = e.PlaybackInfo != null ? InfoDate : null;
 
             writer.Process(e);
         }
 
-        private Dictionary<string, string> GetPlaybackInfo()
+        private bool UpdatePlaybackInfo()
         {
-            var comparer = StringComparer.OrdinalIgnoreCase;
-            var dict = new Dictionary<string, string>(comparer);
+            bool updated = false;
+            if (FetchPlaybackInfo)
+            {
+                var info = GetPlaybackInfo();
+                if (info != null)
+                {
+                    PlaybackInfo = info;
+                    updated = true;
+                    
+                }
+            }
 
+            if (FetchFileInfo)
+            {
+                var curr = GetFile(PlaybackInfo?["FileKey"], fieldList) ?? CurrentFileInfo;
+                var next = GetFile(PlaybackInfo?["NextFileKey"], fieldList) ?? NextFileInfo;
+                if (curr != null) CurrentFileInfo = curr;
+                if (next != null) NextFileInfo = next;
+            }
+
+            return updated;
+        }
+
+        private SafeDictionary<string, string> GetPlaybackInfo()
+        {
             string xml = MCMonitor.api.WebRequest("/MCWS/v1/Playback/Info");
-            var props = Regex.Matches(xml ?? "", @"<Item Name=""(.+?)"">(.+)</Item>", RegexOptions.Multiline);
+            if (string.IsNullOrEmpty(xml))
+                return null;
+
+            var comparer = StringComparer.OrdinalIgnoreCase;
+            var dict = new SafeDictionary<string, string>(comparer);
+            
+            var props = Regex.Matches(xml, @"<Item Name=""(.+?)"">(.+)</Item>", RegexOptions.Multiline);
             foreach (Match prop in props)
                 dict[prop.Groups[1].Value] = prop.Groups[2].Value;
 
             return dict;
         }
 
-        private Dictionary<string, string> GetFile(string key, string[] fieldList)
+        private SafeDictionary<string, string> GetFile(string key, string[] fieldList)
         {
-            var comparer = StringComparer.OrdinalIgnoreCase;
-            var dict = new Dictionary<string, string>(comparer);
-
-            if (string.IsNullOrEmpty(key))
-                return dict;
+           if (string.IsNullOrEmpty(key))
+                return null;
 
             try
             {
                 string json = MCMonitor.api.WebRequest($"/MCWS/v1/File/Getinfo?File={key}&Action=json{fieldQuery}");
+                if (string.IsNullOrEmpty(json))
+                    return null;
+
+                var comparer = StringComparer.OrdinalIgnoreCase;
+                var dict = new SafeDictionary<string, string>(comparer);
+                
                 var data = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(json);
                 if (data != null && data.Count > 0)
                     foreach (var pair in data[0])
                         dict[pair.Key] = pair.Value.ToString();
+
+                return dict;
             }
             catch { }
-            return dict;
+            return null;
         }
     }
 }
