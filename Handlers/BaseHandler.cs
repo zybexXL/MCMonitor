@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace MCMonitor
@@ -25,6 +26,7 @@ namespace MCMonitor
                 DeleteDelay = 10;
 
             jsonOptions.Converters.Add(new JsonDateConverter());
+            jsonOptions.Converters.Add(new JsonStringEnumConverter());
         }
 
         abstract public bool Process(MCEventInfo e);

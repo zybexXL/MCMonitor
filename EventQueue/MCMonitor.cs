@@ -63,12 +63,12 @@ namespace MCMonitor
             if (connected)
             {
                 api.MCEvent += McAPI_MCEvent;
-                ReportEvent(EventSource.MCMonitor, new JAutomationEvent("MCMonitor", "CONNECTED", $"version:{api.MCVersion};Library:{api.Library}"));
+                ReportEvent(EventSource.MCMonitor, new JAutomationEvent("CONNECTED", api.MCVersion, api.Library));
             }
             else if (api != null)
             {
                 api.MCEvent -= McAPI_MCEvent;
-                ReportEvent(EventSource.MCMonitor, new JAutomationEvent("MCMonitor", "DISCONNECTED", null));
+                ReportEvent(EventSource.MCMonitor, new JAutomationEvent("DISCONNECTED", null, null));
             }
         }
 
@@ -77,7 +77,7 @@ namespace MCMonitor
             ReportEvent(EventSource.MCEvent, e);
         }
 
-        private static void ReportEvent(EventSource type, JAutomationEvent e)
+        private static void ReportEvent(EventSource source, JAutomationEvent e)
         {
             if (OnMCEvent == null) return;
             MCEventInfo info = new MCEventInfo()
@@ -87,7 +87,7 @@ namespace MCMonitor
                 Type = e.type?.Replace("MJEvent type: ", ""),
                 Timestamp = DateTime.Now,
                 EventCounter = Interlocked.Increment(ref counter),
-                Source = EventSource.MCEvent
+                Source = source
             };
 
             try { OnMCEvent?.Invoke(api, info); } catch { }

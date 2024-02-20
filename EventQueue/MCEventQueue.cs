@@ -57,8 +57,7 @@ namespace MCMonitor
 
         public void Start()
         {
-            OnMCEventReceived(null, new MCEventInfo() { Source = EventSource.MCMonitor, 
-                Timestamp = DateTime.Now, Type = "MCMonitor", Arg1 = "STARTED" });
+            OnMCEventReceived(null, new MCEventInfo() { Source = EventSource.MCMonitor, Timestamp = DateTime.Now, Type = "STARTED" });
 
             // start event thread
             stopping = false;
@@ -75,8 +74,7 @@ namespace MCMonitor
         {
             MCMonitor.OnMCEvent -= OnMCEventReceived;
 
-            OnMCEventReceived(null, new MCEventInfo() { Source = EventSource.MCMonitor,
-                Timestamp = DateTime.Now, Type = "MCMonitor", Arg1 = "EXITING" });
+            OnMCEventReceived(null, new MCEventInfo() { Source = EventSource.MCMonitor, Timestamp = DateTime.Now, Type = "EXITING" });
 
             // stop command executer
             executer.Stop();
