@@ -29,8 +29,8 @@ namespace MCMonitor
                 if (string.IsNullOrEmpty(template))
                     template = "$time,$sequence,$type,$arg1,$arg2,$state,$currkey,$nextkey";
 
-                NeedsPlaybackInfo = Regex.IsMatch(template, @"\$(state|currkey|nextkey)|\$i\[", RegexOptions.IgnoreCase);
-                NeedsDetails = Regex.IsMatch(template, @"\$\$?\[");
+                NeedsPlaybackInfo = Regex.IsMatch(template, @"\$(state|currkey|nextkey|json)|\$i\[", RegexOptions.IgnoreCase);
+                NeedsDetails = Regex.IsMatch(template, @"\$json|\$\$?\[", RegexOptions.IgnoreCase);
             }
         }
 

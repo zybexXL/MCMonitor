@@ -35,7 +35,6 @@ namespace MCMonitor
         {
             if (template.Contains("$json", StringComparison.InvariantCultureIgnoreCase))
             {
-                
                 string path = CreateTempJson(e, DeleteDelay) ?? "";
                 if (string.IsNullOrEmpty(path)) path = "\"\"";
                 template = template.Replace("$json", path, StringComparison.InvariantCultureIgnoreCase);

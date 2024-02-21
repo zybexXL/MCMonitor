@@ -39,8 +39,8 @@ namespace MCMonitor
 
             foreach (var cmd in config.ExecuteList)
             {
-                if (Regex.IsMatch(cmd, @"\$(state|currkey|nextkey)|\$i\[", RegexOptions.IgnoreCase)) NeedsPlaybackInfo = true;
-                if (Regex.IsMatch(cmd, @"\$\$?\[")) NeedsDetails = true;
+                if (Regex.IsMatch(cmd, @"\$(state|currkey|nextkey|json)|\$i\[", RegexOptions.IgnoreCase)) NeedsPlaybackInfo = true;
+                if (Regex.IsMatch(cmd, @"\$json|\$\$?\[", RegexOptions.IgnoreCase)) NeedsDetails = true;
             }
 
             Start();
