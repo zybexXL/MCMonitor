@@ -44,7 +44,7 @@ namespace MCMonitor
 
         public override string ToString()
         {
-            return $"{EventCounter}:{Source}:{Type}:{Arg1}:{Arg2}";
+            return $"{EventCounter}:{Source}:{Type}:{Arg1}:{Arg2}:{State}";
         }
     }
 }

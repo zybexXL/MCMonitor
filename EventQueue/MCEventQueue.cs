@@ -126,7 +126,10 @@ namespace MCMonitor
 
                 // check filter
                 if (isFilteredOut(e))
+                {
                     FilteredEvents++;
+                    Logger.Log($"Event {e.EventCounter} filtered out: {e}");
+                }
                 else
                 {
                     // process event

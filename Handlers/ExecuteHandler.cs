@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -34,8 +35,10 @@ namespace MCMonitor
             isEnabled = config.ExecuteList != null && config.ExecuteList.Count > 0;
             if (!isEnabled) return;
 
-            if (!double.TryParse(config[ConfigProperty.ExecuteMinWait], out minWait) || minWait < 0) minWait = 0;
-            if (!double.TryParse(config[ConfigProperty.ExecuteMinWait], out maxWait) || maxWait < 0) maxWait = 1;
+            string min = config[ConfigProperty.ExecuteMinWait]?.Replace(',', '.');
+            string max = config[ConfigProperty.ExecuteMaxWait]?.Replace(',', '.');
+            if (!double.TryParse(min, CultureInfo.InvariantCulture, out minWait) || minWait < 0) minWait = 0;
+            if (!double.TryParse(max, CultureInfo.InvariantCulture, out maxWait) || maxWait < 0) maxWait = 1;
 
             foreach (var cmd in config.ExecuteList)
             {
@@ -148,7 +151,7 @@ namespace MCMonitor
 
                     isSuccess = process.WaitForExit(timeout);
                     if (!isSuccess)
-                        Logger.Log("Process did not exit in the given timeout ({timeout} ms)");
+                        Logger.Log($"Process did not exit in the given timeout ({timeout} ms)");
                 }
 
             }
